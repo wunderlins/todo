@@ -5,9 +5,11 @@ sys.path.append("../lib/site-packages")
 #from ZODB.utils import p64
 
 from ZODB import DB, FileStorage
-#from ZODB.PersistentMapping import PersistentMapping
+from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
 import transaction
+
+import urllib
 
 #import pdb;
 
@@ -52,6 +54,7 @@ class Person(Persistent):
 class Node(Persistent):
 	"""Node"""
 	_is_root = False
+	_name_uri = ""
 	
 	parent = None
 	
@@ -70,24 +73,18 @@ class Node(Persistent):
 	
 	children    = [] # list of Node objects
 	
-	def is_root(self):
-		return self._is_root
-	
-	def __repr__(self):
-		#return "<Node " + self.name + "{" + str(self._p_jar[p64(0)]) + "}>"
-		#pdb.set_trace()
-		print type(self._p_oid)
-		return "<Node " + self.name + "{" + str(self._p_oid).encode("hex") + "}>"
-	
-	def get_id(self):
-		return self._p_oid
-	
-	def append(self, node):
-		self.children.append(node)
-		self._p_changed = 1 # important to use this on lists
-		transaction.commit()
-	
 	def __init__(self, name, parent):
+		
+		# check if this path is already used
+		if parent != None:
+			print parent.children
+			"""
+			for e in parent.children:
+				print "-e-> %s|%s" % (name, e.name)
+				if e.name == name:
+					path = name
+					raise NodeExeption("Node exists: %s") % name
+			"""
 		# set the parent node
 		self._is_root = False
 		if parent == None:
@@ -100,11 +97,62 @@ class Node(Persistent):
 		
 		# set defaults
 		self.name = name
+		# TODO: urlencode name 
+		self._name_uri = urllib.quote(name)
+		#print "comitting %s" % self.name
+		#self._p_changed = 1
 		transaction.commit()
 		
 		# for debugging purpose
 		#pass
 
+	def is_root(self):
+		""" check if this is the root node """
+		return self._is_root
+	
+	def __repr__(self):
+		id  = self.get_id("hex")
+		uri = self.get_id("uri")
+		return "<Node " + id + " " + self.name + " " + uri  + ">"
+	
+	def get_id(self, type = "raw"): # types: raw|hex|uri
+		"""get a unique identifier of this object
+		
+		raw
+			it can be obtained as raw which will represent a zodb _p_oid
+			http://zodb.readthedocs.io/en/latest/api.html#transaction.IPersistent._p_oid
+		
+		hex
+			will return the id as hex
+			
+		uri
+			will return an url compatible name.
+		"""
+		
+		if type == "raw":
+			return self._p_oid
+		if type == "hex":
+			return str(self._p_oid).encode("hex")
+		if type == "uri":
+			# TODO: generate path
+			stack = []
+			current = self
+			while True:
+				# prepend name
+				stack.insert(0, self._name_uri)
+				if current.is_root() == True:
+					break
+				current = self.parent
+			
+			return '/'.join(stack)
+			
+		raise NodeError("Unknown type")
+	
+	def add_child(self, node):
+		self.children.append(node)
+		self._p_changed = 1 # important to use this on lists
+		transaction.commit()
+		
 
 if __name__ == "__main__":
 	storage = FileStorage.FileStorage('data/note.fs')
@@ -121,9 +169,10 @@ if __name__ == "__main__":
 	
 	nodes = root["nodes"]
 	
-	nodes.append(Node("Test 1", nodes))
-	nodes.append(Node("Test 2", nodes))
-	nodes.append(Node("Test 4", nodes))
+	nodes.add_child(Node("Test 1", nodes))
+	nodes.add_child(Node("Test 2", nodes))
+	nodes.add_child(Node("Test 4", nodes))
+	nodes.add_child(Node("Test 7", nodes))
 	
 	for e in nodes.children:
 		print(e)
