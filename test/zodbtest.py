@@ -76,9 +76,10 @@ class Node(Persistent):
 	def __repr__(self):
 		#return "<Node " + self.name + "{" + str(self._p_jar[p64(0)]) + "}>"
 		#pdb.set_trace()
-		return "<Node " + self.name + "{" + str(self._p_oid) + "}>"
+		print type(self._p_oid)
+		return "<Node " + self.name + "{" + str(self._p_oid).encode("hex") + "}>"
 	
-	def getOid(self):
+	def get_id(self):
 		return self._p_oid
 	
 	def append(self, node):
