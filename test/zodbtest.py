@@ -5,6 +5,7 @@ sys.path.append("../lib/site-packages")
 #from ZODB.utils import p64
 
 from ZODB import DB, FileStorage
+from BTrees.IOBTree import IOBTree
 from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
 import transaction
@@ -71,7 +72,7 @@ class Node(Persistent):
 	consulted   = []
 	informed    = []
 	
-	children    = [] # list of Node objects
+	children    = IOBTree() # list of Node objects
 	
 	def __init__(self, name, parent):
 		
@@ -101,7 +102,9 @@ class Node(Persistent):
 		self._name_uri = urllib.quote(name)
 		#print "comitting %s" % self.name
 		#self._p_changed = 1
-		transaction.commit()
+		#transaction.commit()
+		
+		#print self._p_oid
 		
 		# for debugging purpose
 		#pass
@@ -150,9 +153,14 @@ class Node(Persistent):
 		raise NodeError("Unknown type")
 	
 	def add_child(self, node):
-		self.children.append(node)
+		#self.children.append(node)
+		try:
+			k = self.children.maxKey()
+		except:
+			k = 0
+		self.children.insert(k+1, node)
 		self._p_changed = 1 # important to use this on lists
-		transaction.commit()
+		#transaction.commit()
 		return node
 		
 if __name__ == "__main__":
@@ -176,6 +184,11 @@ if __name__ == "__main__":
 	t4 = nodes.add_child(Node("Test 4", nodes))
 	nodes.add_child(Node("Test 7", t4))
 	
-	for e in nodes.children:
-		print(e)
+	print transaction.commit()
 	
+	for (k, v) in nodes.children.items():
+		#print v.getid("hex")
+		#print type(v)
+		print v
+	
+	db.close()
