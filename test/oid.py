@@ -28,8 +28,9 @@ class Node(Persistent):
 	
 	def __repr__(self):
 		id  = self.getid("hex")
+		i   = self.getid("int")
 		#return "<Node " + id + " " + self.name + " " + uri  + ">"
-		return "<Node " + id + " " + self.name + ">"
+		return "<Node " + id + " " + self.name + " " + str(i) + ">"
 		
 	def append(self, child):
 		if not isinstance(child, Node):
@@ -117,32 +118,46 @@ if __name__ == "__main__":
 		b = ""
 		for e in enumerate(v.getid()):
 			l = char = e[1]
-			print ord(char)
+			#print ord(char)
 			
 			b += str(ord(char))
 		#print int(b, 16)
 		
 	
-	key = "000000000000001f"
+	
+	key_int = 1
+	
+	import hexdump
+	print hexdump.hexdump(key_int)
+	print "hex " + str(key_int).encode("hex")
+	
+	key_hex = "000000000000001f"
 	key_bin = ""
-	print key, bytes(key)
+	#print key, bytes(key)
 
 
 	i = 0
 	l = None
 	a = []
-	for e in enumerate(key):
+	for e in enumerate(key_hex):
 		char = e[1]
 		if (i % 2 == 1):
-			print "--> " + l + char + " " + str(int(l+char, 16))
+			#print "--> " + l + char + " " + str(int(l+char, 16))
 			a.append(int(l+char, 16))
 			key_bin += chr(int(l+char, 16))
 		
 		i += 1
 		l = char
 		
-	print key_bin
-	print conn.get(key_bin)
+	#print key_bin[7]
+	"""
+	print '%02d' % (ord(key_bin[0]))
+	print '%02d%02d%02d%02d%02d%02d%02d%02d' % (ord(key_bin[0]), ord(key_bin[1]),\
+	      ord(key_bin[2]), ord(key_bin[3]), ord(key_bin[4]), ord(key_bin[5]), ord(key_bin[6]), ord(key_bin[7]))
+	"""
+	
+	item = conn.get(key_bin)
+	print item
 	
 	"""
 	d = bytearray(a)
