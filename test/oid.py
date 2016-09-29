@@ -82,63 +82,15 @@ class Node(Persistent):
 			
 		raise NodeError("Unknown type")
 
-class Note(Node):
-	desc = ""
-	prio = 0
-	due = None # datetime
-	done = False
-	
-	# rasci, expects class Person
-	responsible = []
-	accountable = []
-	support     = []
-	consulted   = []
-	informed    = []
-
-	def __init__(self, name):
-		Node.__init__(self, name)
-
 class Root(Node):
 	def __init__(self):
 		Node.__init__(self, "root")
 		
 	def is_root(self):
 		return True
-
-class Person(Persistent):
-	nickname = ""
-	firstname = ""
-	lastname = ""
-	
-	samaccountname = ""
-	email = ""
-	phone = ""
-	
-	def __init__(self, nickname, firstname="", lastname=""):
-		self.nickname = nickname
-		self.firstname = firstname
-		self.lastname = lastname
-	
-	def __repr__(self):
-		out = "<"
-		if self.lastname:
-			out += self.lastname
 		
-		if self.nickname:
-			if out != "<":
-				out += " "
-			out += '"' + self.nickname + '"'
-		
-		if self.firstname:
-			out += ' ' + self.firstname
-		
-		out += ">"
-		
-		return out
-		#return '<%s "%s" %s>' % (self.lastname, self.nickname, self.firstname)
-
 if __name__ == "__main__":
-	storage = FileStorage.FileStorage('data/note.fs')
+	storage = FileStorage.FileStorage('data/oid.fs')
 	db = DB(storage)
 	conn = db.open()
 	root = conn.root()
@@ -159,10 +111,45 @@ if __name__ == "__main__":
 	#transaction.commit()
 	
 	for (k, v) in items.items():
-		print v
+		print v, str(v.getid()).encode('ascii'), len(v.getid())
+		#print ':'.join(x.encode('hex') for x in v.getid())
 		
-	#e = items.items()[0][1].getid("raw")
-	#print e
-	#print conn.get(e)
+		b = ""
+		for e in enumerate(v.getid()):
+			l = char = e[1]
+			print ord(char)
+			
+			b += str(ord(char))
+		#print int(b, 16)
+		
+	
+	key = "000000000000001f"
+	key_bin = ""
+	print key, bytes(key)
+
+
+	i = 0
+	l = None
+	a = []
+	for e in enumerate(key):
+		char = e[1]
+		if (i % 2 == 1):
+			print "--> " + l + char + " " + str(int(l+char, 16))
+			a.append(int(l+char, 16))
+			key_bin += chr(int(l+char, 16))
+		
+		i += 1
+		l = char
+		
+	print key_bin
+	print conn.get(key_bin)
+	
+	"""
+	d = bytearray(a)
+	print "'" + d + "'"
+	conn.get(d[7])
+	"""	
 	
 	db.close()
+	
+#
