@@ -77,7 +77,7 @@ class Node(Persistent):
 		
 		# check if this path is already used
 		if parent != None:
-			print parent.children
+			#print parent.children
 			"""
 			for e in parent.children:
 				print "-e-> %s|%s" % (name, e.name)
@@ -111,11 +111,11 @@ class Node(Persistent):
 		return self._is_root
 	
 	def __repr__(self):
-		id  = self.get_id("hex")
-		uri = self.get_id("uri")
+		id  = self.getid("hex")
+		uri = self.getid("uri")
 		return "<Node " + id + " " + self.name + " " + uri  + ">"
 	
-	def get_id(self, type = "raw"): # types: raw|hex|uri
+	def getid(self, type = "raw"): # types: raw|hex|uri
 		"""get a unique identifier of this object
 		
 		raw
@@ -134,6 +134,7 @@ class Node(Persistent):
 		if type == "hex":
 			return str(self._p_oid).encode("hex")
 		if type == "uri":
+			#return str(self._p_oid).encode("hex")
 			# TODO: generate path
 			stack = []
 			current = self
@@ -142,7 +143,7 @@ class Node(Persistent):
 				stack.insert(0, self._name_uri)
 				if current.is_root() == True:
 					break
-				current = self.parent
+				current = current.parent
 			
 			return '/'.join(stack)
 			
@@ -152,8 +153,8 @@ class Node(Persistent):
 		self.children.append(node)
 		self._p_changed = 1 # important to use this on lists
 		transaction.commit()
+		return node
 		
-
 if __name__ == "__main__":
 	storage = FileStorage.FileStorage('data/note.fs')
 	db = DB(storage)
@@ -169,10 +170,12 @@ if __name__ == "__main__":
 	
 	nodes = root["nodes"]
 	
-	nodes.add_child(Node("Test 1", nodes))
+	n = Node("Test 1", nodes)
+	nodes.add_child(n)
 	nodes.add_child(Node("Test 2", nodes))
-	nodes.add_child(Node("Test 4", nodes))
-	nodes.add_child(Node("Test 7", nodes))
+	t4 = nodes.add_child(Node("Test 4", nodes))
+	nodes.add_child(Node("Test 7", t4))
 	
 	for e in nodes.children:
 		print(e)
+	
