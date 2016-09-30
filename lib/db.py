@@ -182,7 +182,7 @@ class db(object):
 	root    = None
 	
 	def __init__(self):
-		self.storage = FileStorage.FileStorage('data/oid.fs')
+		self.storage = FileStorage.FileStorage('../var/node.fs')
 		self.db = DB(self.storage)
 		self.conn = self.db.open()
 		self.root = self.conn.root()
