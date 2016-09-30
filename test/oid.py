@@ -13,6 +13,7 @@ from BTrees.IOBTree import IOBTree
 from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
 import transaction
+from urllib import quote as urlquote
 
 class NodeError(Exception):
 	def __init__(self, value):
@@ -67,7 +68,19 @@ class Node(Persistent):
 		id  = self.getid("hex")
 		i   = self.getid("int")
 		#return "<Node " + id + " " + self.name + " " + uri  + ">"
-		return "<Node [" + str(i) + "] " + self.name + ">"
+		return "<Node [" + str(i) + "] " + self.name + " /" + self.uri() + ">"
+	
+	def uri(self):
+		stack = []
+		current = self
+		while True:
+			# prepend name
+			stack.insert(0, urlquote(current.name))
+			if current.is_root() == True:
+				break
+			current = current.parent
+		
+		return "/".join(stack)
 		
 	def append(self, child):
 		if not isinstance(child, Node):
@@ -80,6 +93,9 @@ class Node(Persistent):
 		child.parent = self
 		self.children.insert(k+1, child)
 		transaction.commit()
+	
+	def has_children(self):
+		return len(self.children)
 	
 	def is_root(self):
 		return False
@@ -182,13 +198,13 @@ if __name__ == "__main__":
 	for (k, v) in items.items():
 		#print v, str(v.getid()).encode('ascii'), len(v.getid())
 		#print ':'.join(x.encode('hex') for x in v.getid())
-		print v
+		print v, v.has_children()
 	
 	item = conn.get(NodeUtil.int2bin(17))
-	while item.parent != None:
-		sys.stdout.write(item.name + "/")
-		item = item.parent
-	print item.name
+	print item.uri()
+	
+	i = conn.get(NodeUtil.int2bin(7))
+	i.append(Node("eleven"))
 	
 	"""
 	d = bytearray(a)
