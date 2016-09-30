@@ -181,8 +181,8 @@ class db(object):
 	conn    = None
 	root    = None
 	
-	def __init__(self):
-		self.storage = FileStorage.FileStorage('../var/node.fs')
+	def __init__(self, storage_location='../var/node.fs'):
+		self.storage = FileStorage.FileStorage(storage_location)
 		self.db = DB(self.storage)
 		self.conn = self.db.open()
 		self.root = self.conn.root()
