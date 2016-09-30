@@ -219,8 +219,6 @@ def traverse(root):
 		else:
 			print v
 
-	
-
 if __name__ == "__main__":
 	
 	db = odb()
