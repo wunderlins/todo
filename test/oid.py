@@ -194,22 +194,13 @@ class odb(object):
 			self.items = self.root["items"] = Root()
 			transaction.commit()
 		
-		#return self.items
+	def close(self):
+		self.db.close()
+
+	def get(self, key_bin):
+		return self.conn.get(key_bin)
 
 if __name__ == "__main__":
-	"""
-	storage = FileStorage.FileStorage('data/oid.fs')
-	db = DB(storage)
-	conn = db.open()
-	root = conn.root()
-	
-	try:
-		items = root["items"]
-	except:
-		print("Initializing Database ...")
-		items = root["items"] = Root()
-		transaction.commit()
-	"""
 	
 	db = odb()
 	items = db.items
@@ -219,17 +210,16 @@ if __name__ == "__main__":
 	items.append(Node("two"))
 	items.append(Node("three"))
 	"""
-	#transaction.commit()
 	
 	for (k, v) in items.items():
 		#print v, str(v.getid()).encode('ascii'), len(v.getid())
 		#print ':'.join(x.encode('hex') for x in v.getid())
 		print v, v.has_children()
 	
-	item = db.conn.get(NodeUtil.int2bin(17))
+	item = db.get(NodeUtil.int2bin(17))
 	print item.uri()
 	
-	i = db.conn.get(NodeUtil.int2bin(7))
+	i = db.get(NodeUtil.int2bin(7))
 	i.append(Node("eleven"))
 	
 	"""
@@ -238,6 +228,6 @@ if __name__ == "__main__":
 	conn.get(d[7])
 	"""	
 	
-	db.db.close()
+	db.close()
 	
 #
