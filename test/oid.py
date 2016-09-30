@@ -199,7 +199,18 @@ class odb(object):
 
 	def get(self, key_bin):
 		return self.conn.get(key_bin)
-
+	
+	def get_key(self, obj):
+		for (k, v) in obj.parent.items():
+			if obj == v:
+				return k
+		return None
+	
+	def remove(self, obj):
+		k = self.get_key(obj)
+		obj.parent.children.pop(k)
+		transaction.commit()
+	
 if __name__ == "__main__":
 	
 	db = odb()
@@ -211,16 +222,34 @@ if __name__ == "__main__":
 	items.append(Node("three"))
 	"""
 	
+	"""
+	d = db.get(NodeUtil.int2bin(7))
+	k = db.get_key(d)
+	d.parent.children.pop(k)
+	transaction.commit()
+	"""
+	
+	#db.remove(db.get(NodeUtil.int2bin(31)))
+	
+	#print k
+	
+	"""
+	d = db.get(NodeUtil.int2bin(7))
+	for (k, v) in d.parent.items():
+		if d == v:
+			print k, d
+	"""
+	
 	for (k, v) in items.items():
 		#print v, str(v.getid()).encode('ascii'), len(v.getid())
 		#print ':'.join(x.encode('hex') for x in v.getid())
 		print v, v.has_children()
 	
-	item = db.get(NodeUtil.int2bin(17))
-	print item.uri()
+	#item = db.get(NodeUtil.int2bin(17))
+	#print item.uri()
 	
-	i = db.get(NodeUtil.int2bin(7))
-	i.append(Node("eleven"))
+	#i = db.get(NodeUtil.int2bin(7))
+	#i.append(Node("eleven"))
 	
 	"""
 	d = bytearray(a)
