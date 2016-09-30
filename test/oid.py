@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""see simple http server
+https://github.com/wunderlins/learning/tree/master/python/jsondb
+"""
+
 import sys
 sys.path.append("../lib/site-packages")
 #from ZODB.utils import p64
