@@ -16,6 +16,31 @@ class NodeError(Exception):
 	def __str__(self):
 		return repr(self.value)
 
+class NodeUtil(object):
+	@staticmethod
+	def int2bin(key_int):
+		key_hex = '{0:016x}'.format(key_int)
+		key_bin = ""
+
+		i = 0
+		l = None
+		a = []
+		for e in enumerate(key_hex):
+			char = e[1]
+			#print char
+			if (i % 2 == 1):
+				#print "--> " + l + char + " " + str(int(l+char, 16))
+				a.append(int(l+char, 16))
+				key_bin += chr(int(l+char, 16))
+			i += 1
+			l = char
+			
+		return key_bin
+	
+	@staticmethod
+	def bin2int(key_bin):
+		return int(str(key_bin).encode("hex"), 16)
+	
 class Node(Persistent):
 	""" Abstract node class for a data tree """
 	name     = None
@@ -82,7 +107,7 @@ class Node(Persistent):
 			return int(str(self._p_oid).encode("hex"), 16)
 			
 		raise NodeError("Unknown type")
-
+	
 class Root(Node):
 	def __init__(self):
 		Node.__init__(self, "root")
@@ -108,7 +133,6 @@ if __name__ == "__main__":
 	items.append(Node("two"))
 	items.append(Node("three"))
 	"""
-	
 	#transaction.commit()
 	
 	for (k, v) in items.items():
@@ -124,39 +148,7 @@ if __name__ == "__main__":
 		#print int(b, 16)
 		
 	
-	
-	key_int = 1
-	
-	import hexdump
-	print hexdump.hexdump(key_int)
-	print "hex " + str(key_int).encode("hex")
-	
-	key_hex = "000000000000001f"
-	key_bin = ""
-	#print key, bytes(key)
-
-
-	i = 0
-	l = None
-	a = []
-	for e in enumerate(key_hex):
-		char = e[1]
-		if (i % 2 == 1):
-			#print "--> " + l + char + " " + str(int(l+char, 16))
-			a.append(int(l+char, 16))
-			key_bin += chr(int(l+char, 16))
-		
-		i += 1
-		l = char
-		
-	#print key_bin[7]
-	"""
-	print '%02d' % (ord(key_bin[0]))
-	print '%02d%02d%02d%02d%02d%02d%02d%02d' % (ord(key_bin[0]), ord(key_bin[1]),\
-	      ord(key_bin[2]), ord(key_bin[3]), ord(key_bin[4]), ord(key_bin[5]), ord(key_bin[6]), ord(key_bin[7]))
-	"""
-	
-	item = conn.get(key_bin)
+	item = conn.get(NodeUtil.int2bin(25))
 	print item
 	
 	"""
