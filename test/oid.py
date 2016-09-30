@@ -175,7 +175,29 @@ class Person(Persistent):
 		return out
 		#return '<%s "%s" %s>' % (self.lastname, self.nickname, self.firstname)
 
+class odb(object):
+	storage = None
+	db      = None
+	conn    = None
+	root    = None
+	
+	def __init__(self):
+		self.storage = FileStorage.FileStorage('data/oid.fs')
+		self.db = DB(self.storage)
+		self.conn = self.db.open()
+		self.root = self.conn.root()
+
+		try:
+			self.items = self.root["items"]
+		except:
+			print("Initializing Database ...")
+			self.items = self.root["items"] = Root()
+			transaction.commit()
+		
+		#return self.items
+
 if __name__ == "__main__":
+	"""
 	storage = FileStorage.FileStorage('data/oid.fs')
 	db = DB(storage)
 	conn = db.open()
@@ -187,6 +209,10 @@ if __name__ == "__main__":
 		print("Initializing Database ...")
 		items = root["items"] = Root()
 		transaction.commit()
+	"""
+	
+	db = odb()
+	items = db.items
 	
 	"""
 	items.append(Node("one"))
@@ -200,10 +226,10 @@ if __name__ == "__main__":
 		#print ':'.join(x.encode('hex') for x in v.getid())
 		print v, v.has_children()
 	
-	item = conn.get(NodeUtil.int2bin(17))
+	item = db.conn.get(NodeUtil.int2bin(17))
 	print item.uri()
 	
-	i = conn.get(NodeUtil.int2bin(7))
+	i = db.conn.get(NodeUtil.int2bin(7))
 	i.append(Node("eleven"))
 	
 	"""
@@ -212,6 +238,6 @@ if __name__ == "__main__":
 	conn.get(d[7])
 	"""	
 	
-	db.close()
+	db.db.close()
 	
 #
