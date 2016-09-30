@@ -210,7 +210,17 @@ class odb(object):
 		k = self.get_key(obj)
 		obj.parent.children.pop(k)
 		transaction.commit()
+
+
+def traverse(root):
+	print root
+	for (k, v) in root.items():
+		print v
+		
+		if v.has_children():
+			traverse(v)
 	
+
 if __name__ == "__main__":
 	
 	db = odb()
@@ -240,15 +250,20 @@ if __name__ == "__main__":
 			print k, d
 	"""
 	
+	"""
 	for (k, v) in items.items():
 		#print v, str(v.getid()).encode('ascii'), len(v.getid())
 		#print ':'.join(x.encode('hex') for x in v.getid())
 		print v, v.has_children()
+	"""
+	
+	traverse(items)
+	
 	
 	#item = db.get(NodeUtil.int2bin(17))
 	#print item.uri()
 	
-	#i = db.get(NodeUtil.int2bin(7))
+	#i = db.get(NodeUtil.int2bin(9))
 	#i.append(Node("eleven"))
 	
 	"""
