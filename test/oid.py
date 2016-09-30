@@ -211,14 +211,14 @@ class odb(object):
 		obj.parent.children.pop(k)
 		transaction.commit()
 
-
 def traverse(root):
 	print root
 	for (k, v) in root.items():
-		print v
-		
 		if v.has_children():
 			traverse(v)
+		else:
+			print v
+
 	
 
 if __name__ == "__main__":
