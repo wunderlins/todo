@@ -4,7 +4,7 @@ bower:
 	cd www; bower install
 
 pip:
-	pip install --ignore-installed -t lib/site-packages zodb zope.interface zc.lockfile
+	pip install --ignore-installed -t lib/site-packages zodb zope.interface zc.lockfile Flask
 	touch lib/site-packages/zope/__init__.py
 	touch lib/site-packages/zc/__init__.py
 
@@ -14,4 +14,4 @@ www-start:
 www-stop:
 	./bin/stop.sh &
 
-install: bower pip
+dep: bower pip
