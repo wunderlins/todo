@@ -143,38 +143,6 @@ class Root(Node):
 	def is_root(self):
 		return True
 
-class Person(Persistent):
-	nickname = ""
-	firstname = ""
-	lastname = ""
-	
-	samaccountname = ""
-	email = ""
-	phone = ""
-	
-	def __init__(self, nickname, firstname="", lastname=""):
-		self.nickname = nickname
-		self.firstname = firstname
-		self.lastname = lastname
-	
-	def __repr__(self):
-		out = "<"
-		if self.lastname:
-			out += self.lastname
-		
-		if self.nickname:
-			if out != "<":
-				out += " "
-			out += '"' + self.nickname + '"'
-		
-		if self.firstname:
-			out += ' ' + self.firstname
-		
-		out += ">"
-		
-		return out
-		#return '<%s "%s" %s>' % (self.lastname, self.nickname, self.firstname)
-
 class db(object):
 	storage = None
 	db      = None
