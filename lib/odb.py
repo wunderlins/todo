@@ -143,7 +143,7 @@ class Root(Node):
 	def is_root(self):
 		return True
 
-class db(object):
+class odb(object):
 	storage = None
 	db      = None
 	conn    = None
@@ -192,8 +192,8 @@ def traverse(root):
 
 if __name__ == "__main__":
 	
-	db = db()
-	items = db.get_root()
+	db = odb()
+	items = odb.get_root()
 	
 	"""
 	items.append(Node("one"))
@@ -241,6 +241,6 @@ if __name__ == "__main__":
 	conn.get(d[7])
 	"""	
 	
-	db.close()
+	odb.close()
 	
 #
